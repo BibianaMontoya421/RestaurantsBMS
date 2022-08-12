@@ -2,8 +2,11 @@ import React,{useState} from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button,Icon,Input } from '@rneui/base'
 import { size } from 'lodash'
+import {useNavigation} from '@react-navigation/native'
 
 import { validateEmail } from '../utils/helper'
+import {RegisterUser} from '../utils/actions'
+
 
 
 export default function RegisterForm() {
@@ -12,17 +15,25 @@ export default function RegisterForm() {
     const [errorEmail,setErrorEmail]=useState("")
     const [errorPassword,setErrorPassword]=useState("")
     const [errorConfirm,setErrorConfirm]=useState("")
+    const navigation = useNavigation()
 
     const onChangeM =(e, type) =>{
         setFormData({...formData, [type]:e.nativeEvent.text})
     }
 
-const registerUser = () =>{
+const doregisterUser = async () =>{
     if(!validateData()){
         return;
     }
 
-    console.log("Yuhuuu")
+    const result = await RegisterUser(formData.email, formData.password)
+
+    if(!result.statusResponse){
+        setErrorEmail(result.error)
+        return 
+    }
+
+    navigation.navigate("account-stacks")
 
 }
 
@@ -107,7 +118,7 @@ const validateData =()=>{
         containerStyle={styles.btnContainer}
         title="Registrar nuevo usuario"
         buttonStyle={styles.btn}
-        onPress= {()=>registerUser()}
+        onPress= {()=>doregisterUser()}
       />
     </View>
   )
